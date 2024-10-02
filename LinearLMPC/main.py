@@ -3,106 +3,111 @@ from FTOCP import FTOCP
 from LMPC import LMPC
 import pickle
 
+
 def main():
-	# Define system dynamics and cost
-	A = np.array([[1,1],[0,1]])
-	B = np.array([[0],[1]])
-	Q = np.diag([1.0, 1.0]) #np.eye(2)
-	R = np.array([[1]])
+    # Define system dynamics and cost
+    A = np.array([[1, 1], [0, 1]])
+    B = np.array([[0], [1]])
+    Q = np.diag([1.0, 1.0])  # np.eye(2)
+    R = np.array([[1]])
 
-	print("Computing first feasible trajectory")
-	
-	# Initial Condition
-	x0 = [-15.0, 0.0]
+    print("Computing first feasible trajectory")
 
-	# Initialize FTOCP object
-	N_feas = 10
-	ftocp_for_mpc  = FTOCP(N_feas, A, B, 0.01*Q, R)
+    # Initial Condition
+    x0 = [-15.0, 0.0]
 
-	# ====================================================================================
-	# Run simulation to compute feasible solution
-	# ====================================================================================
-	xcl_feasible = [x0]
-	ucl_feasible = []
-	xt           = x0
-	time         = 0
+    # Initialize FTOCP object
+    N_feas = 10
+    ftocp_for_mpc = FTOCP(N_feas, A, B, 0.01 * Q, R)
 
-	# time Loop (Perform the task until close to the origin)
-	while np.dot(xt, xt) > 10**(-15):
-		xt = xcl_feasible[time] # Read measurements
+    # ====================================================================================
+    # Run simulation to compute feasible solution
+    # ====================================================================================
+    xcl_feasible = [x0]
+    ucl_feasible = []
+    xt = x0
+    time = 0
 
-		ftocp_for_mpc.solve(xt, verbose = False) # Solve FTOCP
+    # time Loop (Perform the task until close to the origin)
+    while np.dot(xt, xt) > 10 ** (-15):
+        xt = xcl_feasible[time]  # Read measurements
 
-		# Read input and apply it to the system
-		ut = ftocp_for_mpc.uPred[:,0]
-		ucl_feasible.append(ut.tolist())
-		xcl_feasible.append(ftocp_for_mpc.model(xcl_feasible[time], ut).tolist())
-		time += 1
+        ftocp_for_mpc.solve(xt, verbose=False)  # Solve FTOCP
 
-	print(np.round(np.array(xcl_feasible).T, decimals=2))
-	print(np.round(np.array(ucl_feasible).T, decimals=2))
-	# ====================================================================================
+        # Read input and apply it to the system
+        ut = ftocp_for_mpc.uPred[:, 0]
+        ucl_feasible.append(ut.tolist())
+        xcl_feasible.append(ftocp_for_mpc.model(xcl_feasible[time], ut).tolist())
+        time += 1
 
-	# ====================================================================================
-	# Run LMPC
-	# ====================================================================================
+    print(np.round(np.array(xcl_feasible).T, decimals=2))
+    print(np.round(np.array(ucl_feasible).T, decimals=2))
+    # ====================================================================================
 
-	# Initialize LMPC object
-	N_LMPC = 3 # horizon length
-	ftocp = FTOCP(N_LMPC, A, B, Q, R) # ftocp solved by LMPC
-	lmpc = LMPC(ftocp, CVX=True) # Initialize the LMPC (decide if you wanna use the CVX hull)
-	lmpc.addTrajectory(xcl_feasible, ucl_feasible) # Add feasible trajectory to the safe set
-	
-	totalIterations = 20 # Number of iterations to perform
+    # ====================================================================================
+    # Run LMPC
+    # ====================================================================================
 
-	# run simulation
-	# iteration loop
-	print("Starting LMPC")
-	for it in range(0,totalIterations):
-		# Set initial condition at each iteration
-		xcl = [x0] 
-		ucl =[]
-		time = 0
-		# time Loop (Perform the task until close to the origin)
-		while np.dot(xcl[time], xcl[time]) > 10**(-10):
-			
-			# Read measurement
-			xt = xcl[time] 
+    # Initialize LMPC object
+    N_LMPC = 3  # horizon length
+    ftocp = FTOCP(N_LMPC, A, B, Q, R)  # ftocp solved by LMPC
+    lmpc = LMPC(
+        ftocp, CVX=True
+    )  # Initialize the LMPC (decide if you wanna use the CVX hull)
+    lmpc.addTrajectory(
+        xcl_feasible, ucl_feasible
+    )  # Add feasible trajectory to the safe set
 
-			# Solve FTOCP
-			lmpc.solve(xt, verbose = False) 
-			# Read optimal input
-			ut = lmpc.uPred[:,0]
+    totalIterations = 20  # Number of iterations to perform
 
-			# Apply optimal input to the system
-			ucl.append(ut.tolist())
-			xcl.append(lmpc.ftocp.model(xcl[time], ut).tolist())
-			time += 1
+    # run simulation
+    # iteration loop
+    print("Starting LMPC")
+    for it in range(0, totalIterations):
+        # Set initial condition at each iteration
+        xcl = [x0]
+        ucl = []
+        time = 0
+        # time Loop (Perform the task until close to the origin)
+        while np.dot(xcl[time], xcl[time]) > 10 ** (-10):
 
-		# Add trajectory to update the safe set and value function
-		lmpc.addTrajectory(xcl, ucl)
+            # Read measurement
+            xt = xcl[time]
 
-	# =====================================================================================
+            # Solve FTOCP
+            lmpc.solve(xt, verbose=False)
+            # Read optimal input
+            ut = lmpc.uPred[:, 0]
+
+            # Apply optimal input to the system
+            ucl.append(ut.tolist())
+            xcl.append(lmpc.ftocp.model(xcl[time], ut).tolist())
+            time += 1
+
+        # Add trajectory to update the safe set and value function
+        lmpc.addTrajectory(xcl, ucl)
+
+    # =====================================================================================
+
+    # ====================================================================================
+    # Compute optimal solution by solving a FTOCP with long horizon
+    # ====================================================================================
+    N = 100  # Set a very long horizon to fake infinite time optimal control problem
+    ftocp_opt = FTOCP(N, A, B, Q, R)
+    ftocp_opt.solve(xcl[0])
+    xOpt = ftocp_opt.xPred
+    uOpt = ftocp_opt.uPred
+    costOpt = lmpc.computeCost(xOpt.T.tolist(), uOpt.T.tolist())
+    print("Optimal cost is: ", costOpt[0])
+    # Store optimal solution in the lmpc object
+    lmpc.optCost = costOpt[0]
+    lmpc.xOpt = xOpt
+
+    # Save the lmpc object
+    filename = "lmpc_object.pkl"
+    filehandler = open(filename, "wb")
+    pickle.dump(lmpc, filehandler)
 
 
-	# ====================================================================================
-	# Compute optimal solution by solving a FTOCP with long horizon
-	# ====================================================================================
-	N = 100 # Set a very long horizon to fake infinite time optimal control problem
-	ftocp_opt = FTOCP(N, A, B, Q, R)
-	ftocp_opt.solve(xcl[0])
-	xOpt = ftocp_opt.xPred
-	uOpt = ftocp_opt.uPred
-	costOpt = lmpc.computeCost(xOpt.T.tolist(), uOpt.T.tolist())
-	print("Optimal cost is: ", costOpt[0])
-	# Store optimal solution in the lmpc object
-	lmpc.optCost = costOpt[0]
-	lmpc.xOpt    = xOpt
-
-	# Save the lmpc object
-	filename = 'lmpc_object.pkl'
-	filehandler = open(filename, 'wb')
-	pickle.dump(lmpc, filehandler)
-
-if __name__== "__main__":
-  main()
+if __name__ == "__main__":
+    main()
