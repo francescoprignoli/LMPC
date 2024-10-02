@@ -63,7 +63,7 @@ class FTOCP(object):
 		cost = 0
 		for i in range(0, self.N):
 			# Running cost h(x,u) = x^TQx + u^TRu
-			cost += cp.quad_form(x[:,i], self.Q) + cp.norm(self.R**0.5*u[:,i])**2
+			cost += cp.quad_form(x[:,i], self.Q) + cp.norm(self.R**0.5@u[:,i])**2
 			# cost += norm(self.Q**0.5*x[:,i])**2 + norm(self.R**0.5*u[:,i])**2
 
 		# Terminal cost if SS not empty
@@ -90,7 +90,7 @@ class FTOCP(object):
 
 	def model(self, x, u):
 		# Compute state evolution
-		return (np.dot(self.A,x) + np.squeeze(np.dot(self.B,u))).tolist()
+		return (np.dot(self.A,x) + np.dot(self.B,u))
 
 
 

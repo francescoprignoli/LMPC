@@ -8,7 +8,7 @@ def main():
 	A = np.array([[1,1],[0,1]])
 	B = np.array([[0],[1]])
 	Q = np.diag([1.0, 1.0]) #np.eye(2)
-	R = 1.0#np.array([[1]])
+	R = np.array([[1]])
 
 	print("Computing first feasible trajectory")
 	
@@ -34,9 +34,9 @@ def main():
 		ftocp_for_mpc.solve(xt, verbose = False) # Solve FTOCP
 
 		# Read input and apply it to the system
-		ut = ftocp_for_mpc.uPred[:,0][0]
-		ucl_feasible.append(ut)
-		xcl_feasible.append(ftocp_for_mpc.model(xcl_feasible[time], ut))
+		ut = ftocp_for_mpc.uPred[:,0]
+		ucl_feasible.append(ut.tolist())
+		xcl_feasible.append(ftocp_for_mpc.model(xcl_feasible[time], ut).tolist())
 		time += 1
 
 	print(np.round(np.array(xcl_feasible).T, decimals=2))
@@ -72,11 +72,11 @@ def main():
 			# Solve FTOCP
 			lmpc.solve(xt, verbose = False) 
 			# Read optimal input
-			ut = lmpc.uPred[:,0][0]
+			ut = lmpc.uPred[:,0]
 
 			# Apply optimal input to the system
-			ucl.append(ut)
-			xcl.append(lmpc.ftocp.model(xcl[time], ut))
+			ucl.append(ut.tolist())
+			xcl.append(lmpc.ftocp.model(xcl[time], ut).tolist())
 			time += 1
 
 		# Add trajectory to update the safe set and value function
