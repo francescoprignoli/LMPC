@@ -1,12 +1,8 @@
 import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
-import matplotlib.font_manager
-matplotlib.font_manager._rebuild()
 import matplotlib.pyplot as plt
-import copy
 import pickle
-import pdb
 from matplotlib import rc
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)

@@ -1,11 +1,6 @@
 import numpy as np
 from FTOCP import FTOCP
 from LMPC import LMPC
-import pdb
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-import copy
 import pickle
 
 def main():
@@ -18,7 +13,7 @@ def main():
 	print("Computing first feasible trajectory")
 	
 	# Initial Condition
-	x0 = [-15.0, 0.0];
+	x0 = [-15.0, 0.0]
 
 	# Initialize FTOCP object
 	N_feas = 10
@@ -28,7 +23,7 @@ def main():
 	# Run simulation to compute feasible solution
 	# ====================================================================================
 	xcl_feasible = [x0]
-	ucl_feasible =[]
+	ucl_feasible = []
 	xt           = x0
 	time         = 0
 
