@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 from matplotlib import rc
-import pdb
+
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 
@@ -20,7 +20,7 @@ iterationTime = []
 circleRadius = 10.0
 P = 20
 roadHalfWidth = 2.0
-print "Current value of P = ",P
+print("Current value of P = ",P)
 # a = raw_input("Pick Value of a = ")
 
 # =========================================================
@@ -51,7 +51,7 @@ xit.append(copy.copy(xcl))
 plt.plot(xcl[0,:], xcl[1,:], 'sr') # Store time to reach xf
 plt.plot(xcl[0,:], xcl[1,:], '-ob', label='LMPC closed-loop at '+str(it)+'th iteration')
 
-print iterationTime
+print(iterationTime)
 
 plt.xlabel('$z$', fontsize=20)
 plt.ylabel('$y$', fontsize=20)
@@ -212,7 +212,7 @@ plt.legend()
 # =========================================================
 # Run Comparison
 # =========================================================
-input = raw_input("Do you want to run comparison for different values of P and l? [y/n] ")
+input = input("Do you want to run comparison for different values of P and l? [y/n] ")
 
 # =========================================================
 # Plot inputs

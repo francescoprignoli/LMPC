@@ -60,8 +60,8 @@ class LMPC(object):
 		self.ftocp.xSol = x[:,0:(self.ftocp.N+1)]
 		self.ftocp.uSol = u[:,0:(self.ftocp.N)]
 		# Print
-		print "Total time added trajectory: ", self.Qfun[-1][0]
-		print "Total time stored trajectories: ", [self.Qfun[x][0] for x in range(0, self.it+1)]
+		print("Total time added trajectory: ", self.Qfun[-1][0])
+		print("Total time stored trajectories: ", [self.Qfun[x][0] for x in range(0, self.it+1)])
 
 		# Update time Improvement counter
 		self.timeImprovement = 0
@@ -168,8 +168,8 @@ class LMPC(object):
 		currIdxShort = currIdx[ currIdx < np.shape(self.SS[it])[1] ]
 		
 		if self.verbose == True:
-			print "Time indices selected"
-			print currIdxShort
+			print("Time indices selected")
+			print(currIdxShort)
 
 		# Progress time indices
 		self.SSindices[it] = self.SSindices[it] + 1

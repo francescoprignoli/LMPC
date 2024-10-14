@@ -1,8 +1,6 @@
 import numpy as np
 from FTOCP import FTOCP
 from LMPC import LMPC
-import pdb
-import dill
 import matplotlib.pyplot as plt
 from tempfile import TemporaryFile
 import copy
@@ -57,16 +55,16 @@ def main():
 		sFinishLine = xclFeasible[0,-1]
 		delta_s = 0.5 #2.0
 		Xf = np.array([[sFinishLine, -roadHalfWidth, 0.0],[sFinishLine+delta_s, roadHalfWidth, 0.0]]).T
-		print "Box Xf"	
-		print Xf
+		print("Box Xf")
+		print(Xf)
 		lmpc.ftocp.set_xf(Xf)
 
 		Xf_vertices = np.concatenate((Xf,Xf), axis = 1 )
 		Xf_vertices[1,2] = roadHalfWidth
 		Xf_vertices[1,3] = -roadHalfWidth
 		lmpc.Xf_vertices = Xf_vertices
-		print "Verices Xf"	
-		print Xf_vertices
+		print("Verices Xf")
+		print(Xf_vertices)
 
 
 	meanTimeCostLMPC = []
@@ -95,16 +93,16 @@ def main():
 
 			# Print results
 			if lmpc.verbose == True:
-				print "State trajectory at time ", time
-				print np.round(np.array(xcl).T, decimals=2)
-				print np.round(np.array(ucl).T, decimals=2)
-				print "==============================================="
+				print("State trajectory at time ", time)
+				print(np.round(np.array(xcl).T, decimals=2))
+				print(np.round(np.array(ucl).T, decimals=2))
+				print("===============================================")
 
 			# Check if goal state has been reached
 			if lmpc.ftocp.checkTaskCompletion(xcl[-1]):
 			# if np.linalg.norm([xcl[-1]-xclFeasible[:,-1]]) <= 1e-4:
 				if lmpc.verbose == True:
-					print "Distance from terminal point:", xcl[-1]-xclFeasible[:,-1]
+					print("Distance from terminal point:", xcl[-1]-xclFeasible[:,-1])
 				break
 
 			# increment time counter
@@ -119,9 +117,9 @@ def main():
 		meanTimeCostLMPC.append(np.array([np.sum(timeLMPC)/lmpc.cost, lmpc.cost]))
 
 		# Print and store results
-		print "++++++===============================================++++++"
-		print "Completed Iteration: ", itCounter
-		print "++++++===============================================++++++"
+		print("++++++===============================================++++++")
+		print("Completed Iteration: ", itCounter)
+		print("++++++===============================================++++++")
 		np.savetxt('storedData/closedLoopIteration'+str(itCounter)+'_P_'+str(lmpc.P)+'_IC.txt', np.round(np.array(xcl), decimals=5).T, fmt='%f' )
 		np.savetxt('storedData/inputIteration'+str(itCounter)+'_P_'+str(lmpc.P)+'_IC.txt', np.round(np.array(ucl), decimals=5).T, fmt='%f' )
 		np.savetxt('storedData/meanTimeLMPC_P_'+str(lmpc.P)+'_IC.txt', np.array(meanTimeCostLMPC), fmt='%f' )

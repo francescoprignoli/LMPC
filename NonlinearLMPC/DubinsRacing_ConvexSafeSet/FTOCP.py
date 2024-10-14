@@ -106,7 +106,7 @@ class FTOCP(object):
 
 		# Check if LMPC cost is decreasing (it should as it is a Lyap function)
 		if np.min(costSolved) >  self.optCost:
-			print "Cost not decreasing: ", self.optCost, np.min(costSolved)
+			print("Cost not decreasing: ", self.optCost, np.min(costSolved))
 			pdb.set_trace()
 
 
@@ -120,22 +120,22 @@ class FTOCP(object):
 		
 		
 		if self.verbose == True:
-			print "Slack Norm: ", optSlack
-			print "Cost Vector:", costSolved, np.argmin(costSolved)
-			print "Optimal Solution:", self.xSol
+			print("Slack Norm: ", optSlack)
+			print("Cost Vector:", costSolved, np.argmin(costSolved))
+			print("Optimal Solution:", self.xSol)
 
 	def buildNonlinearProgram(self, SSQfun):
 		# Define variables
 		n = self.n
 		d = self.d
 		N = self.N
-		X      = SX.sym('X', n*(N+1));
-		U      = SX.sym('X', d*N);
+		X      = SX.sym('X', n*(N+1))
+		U      = SX.sym('X', d*N)
 		dimSS  = np.shape(SSQfun)[1]
 		lamb   = SX.sym('X',  dimSS)
 		xSS    = SSQfun[0:n, :]
 		costSS = np.array([SSQfun[-1, :]])
-		slack  = SX.sym('X', n);
+		slack  = SX.sym('X', n)
 
 		self.dimSS = dimSS
 		self.SSQfun = SSQfun
