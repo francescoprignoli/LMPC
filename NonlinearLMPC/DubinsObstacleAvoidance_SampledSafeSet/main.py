@@ -1,8 +1,6 @@
 import numpy as np
 from FTOCP import FTOCP
 from LMPC import LMPC
-import pdb
-import dill
 import matplotlib.pyplot as plt
 from tempfile import TemporaryFile
 import copy
@@ -25,7 +23,7 @@ def main():
 
 	# Compute feasible trajectory
 	xclFeasible, uclFeasible = feasTraj(ftocp, 40, np.pi/6*2)
-	print np.round(xclFeasible, decimals=2)
+	print(np.round(xclFeasible, decimals=2))
 	np.savetxt('storedData/closedLoopFeasible.txt',xclFeasible, fmt='%f' )
 
 	# Initialize LMPC object
@@ -62,10 +60,10 @@ def main():
 			xcl.append(copy.copy(ftocp.f(xcl[timeStep], ut)))
 
 			# Print results
-			print "State trajectory at time ", timeStep
-			print np.round(np.array(xcl).T, decimals=2)
-			print np.round(np.array(ucl).T, decimals=2)
-			print "==============================================="
+			print("State trajectory at time ", timeStep)
+			print(np.round(np.array(xcl).T, decimals=2))
+			print(np.round(np.array(ucl).T, decimals=2))
+			print("===============================================")
 
 			# increment time counter
 			timeStep += 1
@@ -79,9 +77,9 @@ def main():
 		meanTimeCostLMPC.append(np.array([np.sum(timeLMPC)/lmpc.cost, lmpc.cost])) 
 		
 		# Print and store results
-		print "++++++===============================================++++++"
-		print "Completed Iteration: ", itCounter
-		print "++++++===============================================++++++"
+		print("++++++===============================================++++++")
+		print("Completed Iteration: ", itCounter)
+		print("++++++===============================================++++++")
 
 		# Save closed-loop, input and stats to .txt files
 		np.savetxt('storedData/closedLoopIteration'+str(itCounter)+'_P_'+str(lmpc.P)+'.txt', np.round(np.array(xcl), decimals=5).T, fmt='%f' )
@@ -119,9 +117,9 @@ def feasTraj(ftocp, timeSteps, angle):
 			u[1] = 0   
 	
 		if i<(timeSteps/2) and i > 0:
-			u[0] =  angle;
+			u[0] =  angle
 		elif i >= (timeSteps/2): 
-			u[0] = -angle;
+			u[0] = -angle
 
 		xcl.append(ftocp.f(xcl[-1], u))
 		ucl.append(np.array(u))
